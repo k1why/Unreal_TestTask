@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "../Actors/AbstractActor.h"
+#include "ClassSpawnDataAsset.h"
 #include "ObjectManagerSubsystem.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FManagerSubsystemDelegate);
@@ -16,16 +17,20 @@ class INTERACTIVEOBJECTMANAGER_API UObjectManagerSubsystem : public UGameInstanc
 public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
-
+	
 	UFUNCTION(BlueprintCallable)
 	AAbstractActor* SpawnActor(const FActorData& Data, const FVector& Location);
 
 	UFUNCTION(BlueprintCallable)
-	void DeleteActor(AAbstractActor* Actor);
+	void DeleteActor(AActor* Actor);
 
 	UFUNCTION(BlueprintCallable)
-	void ChangeActor(AAbstractActor* Actor, const FActorData& Data);
+	AAbstractActor* ChangeActor(AAbstractActor* Actor, const FActorData& Data);
 
 protected:
 	TSubclassOf<AAbstractActor> GetActorClass(ESpawnPrimitiveType Type) const;
+
+protected:
+	UPROPERTY()
+	TObjectPtr<UClassSpawnDataAsset> DataAsset;
 };

@@ -21,11 +21,15 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetActorData(const FActorData& InData);
+
+	UFUNCTION(BlueprintCallable)
+	FActorData GetActorData() const;
 	
 	FSharedData ShareData_Implementation();
 
 protected:
-	void UpdateActor();
+	void UpdateScale(const float InScale);
+	void UpdateColor(const FLinearColor& InColor);
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Settings")
@@ -33,4 +37,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category="Components")
 	TObjectPtr<UStaticMeshComponent> StaticMeshComponent;
+
+	UPROPERTY(EditAnywhere, Category="Material")
+	TObjectPtr<UMaterialParameterCollection> MaterialParamCollection;
 };

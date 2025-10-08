@@ -2,13 +2,14 @@
 
 
 #include "ObjectManagerSubsystem.h"
-
-#include "../Actors/CubeActor.h"
-#include "../Actors/SphereActor.h"
+#include "../GameCommon/CustomGameInstance.h"
 
 void UObjectManagerSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
+	
+	TObjectPtr<UCustomGameInstance> GI = Cast<UCustomGameInstance>(GetGameInstance());
+	DataAsset = GI->SpawnData;
 }
 
 void UObjectManagerSubsystem::Deinitialize()
@@ -18,6 +19,8 @@ void UObjectManagerSubsystem::Deinitialize()
 
 AAbstractActor* UObjectManagerSubsystem::SpawnActor(const FActorData& Data, const FVector& Location)
 {
+	if (!IsValid(DataAsset)) return nullptr;
+	
 	if (AAbstractActor* Actor = GetWorld()->SpawnActor<AAbstractActor>(GetActorClass(Data.Type), Location, {0.f, 0.f, 0.f}, {}))
 	{
 		Actor->SetActorData(Data);
@@ -27,21 +30,27 @@ AAbstractActor* UObjectManagerSubsystem::SpawnActor(const FActorData& Data, cons
 	return nullptr;
 }
 
-void UObjectManagerSubsystem::DeleteActor(AAbstractActor* Actor)
+void UObjectManagerSubsystem::DeleteActor(AActor* Actor)
 {
 	if (Actor) Actor->Destroy();
 }
 
-void UObjectManagerSubsystem::ChangeActor(AAbstractActor* Actor, const FActorData& Data)
+AAbstractActor* UObjectManagerSubsystem::ChangeActor(AAbstractActor* Actor, const FActorData& Data)
 {
+	FActorData OldData = Actor->GetActorData();
+	if (OldData.Type != Data.Type)
+	{
+		FVector Location = Actor->GetActorLocation();
+		DeleteActor(Actor);
+		
+		return SpawnActor(Data, Location);
+	}
+
+	Actor->SetActorData(Data);
+	return nullptr;
 }
 
 TSubclassOf<AAbstractActor> UObjectManagerSubsystem::GetActorClass(ESpawnPrimitiveType Type) const
 {
-	switch (Type) {
-		case ESpawnPrimitiveType::SPHERE: return ASphereActor::StaticClass();
-		case ESpawnPrimitiveType::CUBE: return ACubeActor::StaticClass();
-	}
-
-	return TSubclassOf<AAbstractActor>();
+	return *DataAsset->SpawnedActorClasses.Find(Type);
 }
