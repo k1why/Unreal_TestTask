@@ -1,0 +1,31 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Subsystems/GameInstanceSubsystem.h"
+#include "../Actors/AbstractActor.h"
+#include "ObjectManagerSubsystem.generated.h"
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FManagerSubsystemDelegate);
+
+UCLASS()
+class INTERACTIVEOBJECTMANAGER_API UObjectManagerSubsystem : public UGameInstanceSubsystem
+{
+	GENERATED_BODY()
+public:
+	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+	virtual void Deinitialize() override;
+
+	UFUNCTION(BlueprintCallable)
+	AAbstractActor* SpawnActor(const FActorData& Data, const FVector& Location);
+
+	UFUNCTION(BlueprintCallable)
+	void DeleteActor(AAbstractActor* Actor);
+
+	UFUNCTION(BlueprintCallable)
+	void ChangeActor(AAbstractActor* Actor, const FActorData& Data);
+
+protected:
+	TSubclassOf<AAbstractActor> GetActorClass(ESpawnPrimitiveType Type) const;
+};
