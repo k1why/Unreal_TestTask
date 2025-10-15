@@ -5,8 +5,8 @@
 
 #include "Components/SceneComponent.h"
 #include "Components/StaticMeshComponent.h"
-#include "Materials/MaterialExpressionConstant3Vector.h"
-#include "Materials/MaterialParameterCollectionInstance.h"
+
+#include "InteractiveObjectManager/Runtime/Settings/Logger.h"
 
 // Sets default values
 AAbstractActor::AAbstractActor()
@@ -43,8 +43,32 @@ void AAbstractActor::UpdateScale(const float InScale)
 void AAbstractActor::UpdateColor(const FLinearColor& InColor)
 {
 	Data.Color = InColor;
-	if (UMaterialParameterCollectionInstance* PCI = GetWorld()->GetParameterCollectionInstance(MaterialParamCollection))
+
+	if (Material)
 	{
-		bool Found = PCI->SetVectorParameterValue(FName("Color"), Data.Color);
+		Material->SetVectorParameterValue(FName("Color"), Data.Color);
+	}
+	else
+	{
+		UE_LOG(LogInteractiveManager, Warning, TEXT("[%s] Can't find Material Instance Dynamic : %s"), *this->GetName(), *StaticMeshComponent->GetMaterial(0)->GetName());
+	}
+}
+
+void AAbstractActor::PostActorCreated()
+{
+	Super::PostActorCreated();
+
+	if (auto BaseMaterial = StaticMeshComponent->GetMaterial(0))
+	{
+		Material = UMaterialInstanceDynamic::Create(StaticMeshComponent->GetMaterial(0),this);
+		Material->SetFlags(RF_Transient);
+		
+		StaticMeshComponent->SetMaterial(0, Material);
+
+		UE_LOG(LogInteractiveManager, Warning, TEXT("[%s] create Material name : %s"), *this->GetName(), *StaticMeshComponent->GetMaterial(0)->GetName());
+	}
+	else
+	{
+		UE_LOG(LogInteractiveManager, Error, TEXT("[%s] Impossible to find Material at 0"), *this->GetName());
 	}
 }

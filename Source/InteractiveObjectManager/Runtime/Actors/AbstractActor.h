@@ -9,6 +9,7 @@
 #include "AbstractActor.generated.h"
 
 class UStaticMeshComponent;
+class UMaterialInstanceDynamic;
 
 UCLASS(Abstract, Blueprintable, BlueprintType)
 class INTERACTIVEOBJECTMANAGER_API AAbstractActor : public AActor, public IDataShareInterface
@@ -31,6 +32,8 @@ protected:
 	void UpdateScale(const float InScale);
 	void UpdateColor(const FLinearColor& InColor);
 
+	void PostActorCreated() override;
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Settings")
 	FActorData Data;
@@ -40,4 +43,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category="Material")
 	TObjectPtr<UMaterialParameterCollection> MaterialParamCollection;
+
+	UPROPERTY()
+	TObjectPtr<UMaterialInstanceDynamic> Material;
 };

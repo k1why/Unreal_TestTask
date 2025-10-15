@@ -17,11 +17,11 @@ struct FActorData
 	GENERATED_BODY()
 	
 	UPROPERTY(BlueprintReadWrite)
-	float Scale;
+	float Scale = 1.f;
 	
 	UPROPERTY(BlueprintReadWrite)
-	FLinearColor Color;
+	FLinearColor Color = FLinearColor::Blue;
 	
 	UPROPERTY(BlueprintReadWrite)
-	ESpawnPrimitiveType Type;
+	ESpawnPrimitiveType Type = ESpawnPrimitiveType::CUBE;
 };

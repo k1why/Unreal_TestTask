@@ -27,6 +27,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	AAbstractActor* ChangeActor(AAbstractActor* Actor, const FActorData& Data);
 
+	UFUNCTION(BlueprintCallable)
+	void OnINIFileError(const UObject* Caller, const FString Error);
+
 protected:
 	TSubclassOf<AAbstractActor> GetActorClass(ESpawnPrimitiveType Type) const;
 

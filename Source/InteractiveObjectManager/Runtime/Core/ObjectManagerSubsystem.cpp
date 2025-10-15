@@ -3,13 +3,21 @@
 
 #include "ObjectManagerSubsystem.h"
 #include "../GameCommon/CustomGameInstance.h"
+#include "../Settings/Logger.h"
 
 void UObjectManagerSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 	
 	TObjectPtr<UCustomGameInstance> GI = Cast<UCustomGameInstance>(GetGameInstance());
-	DataAsset = GI->SpawnData;
+	if (IsValid(GI->SpawnData))
+	{
+		DataAsset = GI->SpawnData;
+	}
+	else
+	{
+		UE_LOG(LogInteractiveManager, Error, TEXT("[%s] Spawn Data Asset is not set !!!!"), *this->GetName());
+	}
 }
 
 void UObjectManagerSubsystem::Deinitialize()
@@ -48,6 +56,11 @@ AAbstractActor* UObjectManagerSubsystem::ChangeActor(AAbstractActor* Actor, cons
 
 	Actor->SetActorData(Data);
 	return nullptr;
+}
+
+void UObjectManagerSubsystem::OnINIFileError(const UObject* Caller, const FString Error)
+{
+	UE_LOG(LogInteractiveManager, Error, TEXT("[%s] Error with INI file: %s."), *Caller->GetName(), *Error);
 }
 
 TSubclassOf<AAbstractActor> UObjectManagerSubsystem::GetActorClass(ESpawnPrimitiveType Type) const
